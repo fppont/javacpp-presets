@@ -8,7 +8,7 @@ if [[ -z "$PLATFORM" ]]; then
 fi
 
 DISABLE="--disable-w32threads --disable-iconv --disable-opencl --disable-sdl --disable-bzlib --disable-lzma"
-ENABLE="--enable-pthreads --enable-shared --enable-gpl --enable-version3 --enable-nonfree --enable-runtime-cpudetect --enable-zlib --enable-libmp3lame --enable-libspeex --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-openssl --enable-libopenh264 --enable-libx264 --enable-libx265 --enable-libvpx"
+ENABLE="--enable-pthreads --enable-shared --enable-gpl --enable-version3 --enable-nonfree --enable-runtime-cpudetect --enable-zlib --enable-libmp3lame --enable-libspeex --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-openssl --enable-libopenh264 --enable-libx264 --enable-libx265 --enable-libvpx --enable-libfdk-aac"
 
 # minimal configuration to support MPEG-4 streams with H.264 and AAC as well as Motion JPEG
 # DISABLE="--disable-w32threads --disable-iconv --disable-libxcb --disable-opencl --disable-sdl --disable-bzlib --disable-lzma --disable-everything"
@@ -34,6 +34,7 @@ download ftp://ftp.videolan.org/pub/videolan/x264/snapshots/last_stable_x264.tar
 download https://ftp.videolan.org/pub/videolan/x265/$X265.tar.gz $X265.tar.gz
 download https://chromium.googlesource.com/webm/libvpx/+archive/$VPX_VERSION.tar.gz libvpx-$VPX_VERSION.tar.gz
 download ftp://ftp.alsa-project.org/pub/lib/alsa-lib-$ALSA_VERSION.tar.bz2 alsa-lib-$ALSA_VERSION.tar.bz2
+download https://github.com/mstorsjo/fdk-aac/tarball/master fdk-aac.tar.gz
 download http://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2 ffmpeg-$FFMPEG_VERSION.tar.bz2
 
 mkdir -p $PLATFORM
@@ -50,6 +51,7 @@ tar --totals -xjf ../last_stable_x264.tar.bz2
 tar --totals -xzf ../$X265.tar.gz
 mkdir -p libvpx-$VPX_VERSION
 tar --totals -xzf ../libvpx-$VPX_VERSION.tar.gz -C libvpx-$VPX_VERSION
+tar --totals -xzf ../fdk-aac.tar.gz
 tar --totals -xjf ../ffmpeg-$FFMPEG_VERSION.tar.bz2
 X264=`echo x264-snapshot-*`
 
@@ -102,6 +104,11 @@ case $PLATFORM in
         make install
         cd ../libvpx-$VPX_VERSION
         LDFLAGS= ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples --sdk-path=$ANDROID_NDK --disable-tools --target=armv7-android-gcc --disable-runtime-cpu-detect --disable-neon --disable-neon-asm
+        make -j $MAKEJ
+        make install
+        cd ../mstorsjo-fdk-aac*
+        autoreconf -fiv
+        ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
         make -j $MAKEJ
         make install
         cd ../ffmpeg-$FFMPEG_VERSION
@@ -161,6 +168,11 @@ case $PLATFORM in
         ASFLAGS="-D__ANDROID__" ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples --disable-tools --target=x86-android-gcc
         make -j $MAKEJ
         make install
+        cd ../mstorsjo-fdk-aac*
+        autoreconf -fiv
+        ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
+        make -j $MAKEJ
+        make install
         cd ../ffmpeg-$FFMPEG_VERSION
         patch -Np1 < ../../../ffmpeg-$FFMPEG_VERSION-android.patch
         ./configure --prefix=.. $DISABLE $ENABLE --enable-cross-compile --cross-prefix="$ANDROID_BIN-" --ranlib="$ANDROID_BIN-ranlib" --sysroot="$ANDROID_ROOT" --target-os=linux --arch=atom --extra-cflags="-I../include/ $CFLAGS" --extra-ldflags="$ANDROID_ROOT/usr/lib/crtbegin_so.o -L../lib/ -L$ANDROID_CPP/libs/x86/ $LDFLAGS" --extra-libs="-lgnustl_static $LIBS" --disable-symver --disable-programs
@@ -203,6 +215,11 @@ case $PLATFORM in
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples --target=x86-linux-gcc --as=yasm
         make -j $MAKEJ
         make install
+        cd ../mstorsjo-fdk-aac*
+        autoreconf -fiv
+        ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
+        make -j $MAKEJ
+        make install
         cd ../ffmpeg-$FFMPEG_VERSION
         patch -Np1 < ../../../ffmpeg-$FFMPEG_VERSION-linux.patch
         PKG_CONFIG_PATH=../lib/pkgconfig/ ./configure --prefix=.. $DISABLE $ENABLE --enable-libxcb --cc="gcc -m32" --extra-cflags="-I../include/" --extra-ldflags="-L../lib/" --extra-libs="-lstdc++ -ldl"
@@ -243,6 +260,11 @@ case $PLATFORM in
         make install
         cd ../libvpx-$VPX_VERSION
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples --target=x86_64-linux-gcc --as=yasm
+        make -j $MAKEJ
+        make install
+        cd ../mstorsjo-fdk-aac*
+        autoreconf -fiv
+        ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
         make -j $MAKEJ
         make install
         cd ../ffmpeg-$FFMPEG_VERSION
@@ -413,6 +435,11 @@ case $PLATFORM in
         make install
         cd ../libvpx-$VPX_VERSION
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples
+        make -j $MAKEJ
+        make install
+        cd ../mstorsjo-fdk-aac*
+        autoreconf -fiv
+        ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
         make -j $MAKEJ
         make install
         cd ../ffmpeg-$FFMPEG_VERSION

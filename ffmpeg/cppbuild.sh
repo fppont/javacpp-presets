@@ -20,21 +20,24 @@ SPEEX=speex-1.2.0
 OPENCORE_AMR=opencore-amr-0.1.5
 OPENSSL=openssl-1.1.0f
 OPENH264_VERSION=1.7.0
-X265=x265_2.4
+X265=2.4
 VPX_VERSION=v1.6.1
 ALSA_VERSION=1.1.4.1
+LIBFDK_VERSION=0.1.5
 FFMPEG_VERSION=3.3.2
+X264=x264-snapshot-20170826-2245-stable
+
 download http://zlib.net/$ZLIB.tar.gz $ZLIB.tar.gz
 download http://downloads.sourceforge.net/project/lame/lame/3.99/$LAME.tar.gz $LAME.tar.gz
 download http://downloads.xiph.org/releases/speex/$SPEEX.tar.gz $SPEEX.tar.gz
 download http://sourceforge.net/projects/opencore-amr/files/opencore-amr/$OPENCORE_AMR.tar.gz/download $OPENCORE_AMR.tar.gz
 download https://www.openssl.org/source/$OPENSSL.tar.gz $OPENSSL.tar.gz
 download https://github.com/cisco/openh264/archive/v$OPENH264_VERSION.tar.gz openh264-$OPENH264_VERSION.tar.gz
-download ftp://ftp.videolan.org/pub/videolan/x264/snapshots/last_stable_x264.tar.bz2 last_stable_x264.tar.bz2
-download https://ftp.videolan.org/pub/videolan/x265/$X265.tar.gz $X265.tar.gz
+download https://download.videolan.org/x264/snapshots/$X264.tar.bz2 $X264.tar.bz2
+download https://github.com/videolan/x265/archive/$X265.tar.gz x265-$X265.tar.gz
 download https://chromium.googlesource.com/webm/libvpx/+archive/$VPX_VERSION.tar.gz libvpx-$VPX_VERSION.tar.gz
 download ftp://ftp.alsa-project.org/pub/lib/alsa-lib-$ALSA_VERSION.tar.bz2 alsa-lib-$ALSA_VERSION.tar.bz2
-download https://github.com/mstorsjo/fdk-aac/tarball/master fdk-aac.tar.gz
+download https://github.com/mstorsjo/fdk-aac/archive/v$LIBFDK_VERSION.tar.gz fdk-aac-v$LIBFDK_VERSION.tar.gz
 download http://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2 ffmpeg-$FFMPEG_VERSION.tar.bz2
 
 mkdir -p $PLATFORM
@@ -47,13 +50,13 @@ tar --totals -xzf ../$SPEEX.tar.gz
 tar --totals -xzf ../$OPENCORE_AMR.tar.gz
 tar --totals -xzf ../$OPENSSL.tar.gz
 tar --totals -xzf ../openh264-$OPENH264_VERSION.tar.gz
-tar --totals -xjf ../last_stable_x264.tar.bz2
-tar --totals -xzf ../$X265.tar.gz
+tar --totals -xjf ../$X264.tar.bz2
+tar --totals -xzf ../x265-$X265.tar.gz
 mkdir -p libvpx-$VPX_VERSION
 tar --totals -xzf ../libvpx-$VPX_VERSION.tar.gz -C libvpx-$VPX_VERSION
-tar --totals -xzf ../fdk-aac.tar.gz
+tar --totals -xzf ../fdk-aac-v$LIBFDK_VERSION.tar.gz
 tar --totals -xjf ../ffmpeg-$FFMPEG_VERSION.tar.bz2
-X264=`echo x264-snapshot-*`
+
 
 case $PLATFORM in
     android-arm)
@@ -106,7 +109,7 @@ case $PLATFORM in
         LDFLAGS= ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples --sdk-path=$ANDROID_NDK --disable-tools --target=armv7-android-gcc --disable-runtime-cpu-detect --disable-neon --disable-neon-asm
         make -j $MAKEJ
         make install
-        cd ../mstorsjo-fdk-aac*
+        cd ../fdk-aac-$LIBFDK_VERSION
         autoreconf -fiv
         ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
         make -j $MAKEJ
@@ -168,7 +171,7 @@ case $PLATFORM in
         ASFLAGS="-D__ANDROID__" ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples --disable-tools --target=x86-android-gcc
         make -j $MAKEJ
         make install
-        cd ../mstorsjo-fdk-aac*
+        cd ../fdk-aac-$LIBFDK_VERSION
         autoreconf -fiv
         ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
         make -j $MAKEJ
@@ -215,7 +218,7 @@ case $PLATFORM in
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples --target=x86-linux-gcc --as=yasm
         make -j $MAKEJ
         make install
-        cd ../mstorsjo-fdk-aac*
+        cd ../fdk-aac-$LIBFDK_VERSION
         autoreconf -fiv
         ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
         make -j $MAKEJ
@@ -254,7 +257,7 @@ case $PLATFORM in
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-opencl --host=x86_64-linux
         make -j $MAKEJ
         make install
-        cd ../$X265
+        cd ../x265-$X265
         CC="gcc -m64" CXX="g++ -m64" $CMAKE -DENABLE_SHARED=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=.. source
         make -j $MAKEJ
         make install
@@ -262,7 +265,7 @@ case $PLATFORM in
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples --target=x86_64-linux-gcc --as=yasm
         make -j $MAKEJ
         make install
-        cd ../mstorsjo-fdk-aac*
+        cd ../fdk-aac-$LIBFDK_VERSION
         autoreconf -fiv
         ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
         make -j $MAKEJ
@@ -429,7 +432,7 @@ case $PLATFORM in
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-opencl
         make -j $MAKEJ
         make install
-        cd ../$X265
+        cd ../x265-$X265
         CC="clang" CXX="clang++" $CMAKE -DENABLE_SHARED=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=.. source
         make -j $MAKEJ
         make install
@@ -437,7 +440,7 @@ case $PLATFORM in
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples
         make -j $MAKEJ
         make install
-        cd ../mstorsjo-fdk-aac*
+        cd ../fdk-aac-$LIBFDK_VERSION
         autoreconf -fiv
         ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
         make -j $MAKEJ

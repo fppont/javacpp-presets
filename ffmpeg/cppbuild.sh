@@ -257,7 +257,7 @@ case $PLATFORM in
         cd ../openh264-$OPENH264_VERSION
         make -j $MAKEJ DESTDIR=./ PREFIX=.. AR=ar ARCH=x86_64 USE_ASM=No libraries install-static
         cd ../$X264
-        ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-opencl --host=x86_64-linux
+        ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-opencl --host=x86_64-linux # --bit-depth=10
         make -j $MAKEJ
         make install
         cd ../x265-$X265
@@ -436,7 +436,7 @@ case $PLATFORM in
         cd ../openh264-$OPENH264_VERSION
         make -j $MAKEJ DESTDIR=./ PREFIX=.. AR=ar USE_ASM=No libraries install-static
         cd ../$X264
-        ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-opencl
+        ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-opencl # --bit-depth=10
         make -j $MAKEJ
         make install
         cd ../x265-$X265

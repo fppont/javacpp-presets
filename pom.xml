@@ -37,9 +37,9 @@
   </developers>
 
   <modules>
-    <module>opencv</module>
+    <!--<module>opencv</module>-->
     <module>ffmpeg</module>
-    <module>flycapture</module>
+    <!--<module>flycapture</module>
     <module>libdc1394</module>
     <module>libfreenect</module>
     <module>libfreenect2</module>
@@ -62,7 +62,7 @@
     <module>tensorflow</module>
     <module>ale</module>
     <module>liquidfun</module>
-    <module>skia</module>
+    <module>skia</module>-->
   </modules>
 
   <prerequisites>

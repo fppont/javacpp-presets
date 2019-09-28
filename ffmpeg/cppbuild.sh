@@ -23,6 +23,7 @@ OPENH264_VERSION=1.7.0
 X265=2.4
 VPX_VERSION=v1.6.1
 ALSA_VERSION=1.1.4.1
+FREETYPE_VERSION=2.8.1
 LIBFDK_VERSION=0.1.5
 FFMPEG_VERSION=3.3.2
 X264=x264-snapshot-20170826-2245-stable
@@ -37,6 +38,7 @@ download https://download.videolan.org/x264/snapshots/$X264.tar.bz2 $X264.tar.bz
 download https://github.com/videolan/x265/archive/$X265.tar.gz x265-$X265.tar.gz
 download https://chromium.googlesource.com/webm/libvpx/+archive/$VPX_VERSION.tar.gz libvpx-$VPX_VERSION.tar.gz
 download ftp://ftp.alsa-project.org/pub/lib/alsa-lib-$ALSA_VERSION.tar.bz2 alsa-lib-$ALSA_VERSION.tar.bz2
+download https://ftp.osuosl.org/pub/blfs/conglomeration/freetype/freetype-$FREETYPE_VERSION.tar.bz2 freetype-$FREETYPE_VERSION.tar.bz2
 download https://github.com/mstorsjo/fdk-aac/archive/v$LIBFDK_VERSION.tar.gz fdk-aac-v$LIBFDK_VERSION.tar.gz
 download http://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2 ffmpeg-$FFMPEG_VERSION.tar.bz2
 
@@ -54,6 +56,7 @@ tar --totals -xjf ../$X264.tar.bz2
 tar --totals -xzf ../x265-$X265.tar.gz
 mkdir -p libvpx-$VPX_VERSION
 tar --totals -xzf ../libvpx-$VPX_VERSION.tar.gz -C libvpx-$VPX_VERSION
+tar --totals -xjf ../freetype-$FREETYPE_VERSION.tar.bz2
 tar --totals -xzf ../fdk-aac-v$LIBFDK_VERSION.tar.gz
 tar --totals -xjf ../ffmpeg-$FFMPEG_VERSION.tar.bz2
 
@@ -265,6 +268,10 @@ case $PLATFORM in
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples --target=x86_64-linux-gcc --as=yasm
         make -j $MAKEJ
         make install
+        cd ../freetype-$FREETYPE_VERSION
+        ./configure --prefix=$INSTALL_PATH --with-bzip2=no --with-harfbuzz=no --with-png=no --enable-static --disable-shared --with-pic --host=x86_64-linux CFLAGS="-m64"
+        make -j $MAKEJ
+        make install
         cd ../fdk-aac-$LIBFDK_VERSION
         autoreconf -fiv
         ./configure --prefix=$INSTALL_PATH --disable-shared --with-pic
@@ -438,6 +445,10 @@ case $PLATFORM in
         make install
         cd ../libvpx-$VPX_VERSION
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-examples
+        make -j $MAKEJ
+        make install
+        cd ../freetype-$FREETYPE_VERSION
+        ./configure --prefix=$INSTALL_PATH --with-bzip2=no --with-harfbuzz=no --with-png=no --enable-static --disable-shared --with-pic --host=x86_64-linux CFLAGS="-m64"
         make -j $MAKEJ
         make install
         cd ../fdk-aac-$LIBFDK_VERSION
